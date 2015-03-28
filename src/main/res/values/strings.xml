@@ -2,4 +2,6 @@
     <string name="app_name">Trending Media</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_share">Share</string>
+    <string name="title_activity_main_activity2">MainActivity2Activity</string>
+    <string name="action_settings">Settings</string>
 </resources>

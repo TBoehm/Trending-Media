@@ -1,4 +1,33 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools" android:id="@+id/container"
     android:layout_width="match_parent" android:layout_height="match_parent"
-    tools:context=".MainActivity" tools:ignore="MergeRootFrame" />
+    tools:context=".MainActivity" tools:ignore="MergeRootFrame">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        android:background="@color/primary"
+        android:id="@+id/linearLayout">
+        <org.apmem.tools.layouts.FlowLayout
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/ma_hashtag_container">
+        </org.apmem.tools.layouts.FlowLayout>
+
+        <MultiAutoCompleteTextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="New MultiAutoCompleteTextView"
+            android:id="@+id/multiAutoCompleteTextView"
+            android:textColor="#ffffffff" />
+    </LinearLayout>
+
+    <GridLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_below="@+id/linearLayout"
+        android:layout_alignParentStart="true"></GridLayout>
+</RelativeLayout>

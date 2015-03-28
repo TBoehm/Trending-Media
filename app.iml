@@ -89,6 +89,7 @@
     <orderEntry type="library" exported="" name="guava-18.0" level="project" />
     <orderEntry type="library" exported="" name="flickrj-android-2.1.0" level="project" />
     <orderEntry type="library" exported="" name="butterknife-6.1.0" level="project" />
+    <orderEntry type="library" exported="" name="layouts-1.8" level="project" />
     <orderEntry type="library" exported="" name="support-v4-22.0.0" level="project" />
     <orderEntry type="library" exported="" name="twitter4j-core-4.0.2" level="project" />
     <orderEntry type="library" exported="" name="support-annotations-22.0.0" level="project" />
