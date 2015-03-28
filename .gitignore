@@ -26,3 +26,4 @@ proguard/
 # Log Files
 *.log
 /src/main/res/values/private_properties.xml
+/src/main/res/values/private_properties.xml
