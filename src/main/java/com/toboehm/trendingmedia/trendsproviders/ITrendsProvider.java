@@ -1,7 +1,8 @@
 package com.toboehm.trendingmedia.trendsproviders;
 
+import android.location.Address;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 
 /**
  * Created by Tobias Boehm on 28.03.2015.
@@ -9,8 +10,20 @@ import java.util.ArrayList;
 public interface ITrendsProvider {
 
     /**
-     * Returns a list of (global) trends sorted by trendiness.
+     * Asynchronously requests a set of trends of a specific place.
      * @return
      */
-    public ArrayList<String> getTrends();
+    public void asyncRequestRegionTrends(final Address pPlace, final ITrendsDownloadedListener pListener);
+
+    /**
+     * Asynchronously requests a set of (global) trends.
+     * @return
+     */
+    public void asyncRequestGlobalTrends(final ITrendsDownloadedListener pListener);
+
+    /**
+     *
+     * @return true if the provider is completely initialized
+     */
+    public boolean isReady();
 }

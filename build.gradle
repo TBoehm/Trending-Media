@@ -8,8 +8,8 @@ android {
         applicationId "com.toboehm.trendingmedia"
         minSdkVersion 19
         targetSdkVersion 22
-        versionCode 1
-        versionName "1.0"
+        versionCode 11
+        versionName "0.11"
     }
     buildTypes {
         release {
@@ -27,4 +27,5 @@ dependencies {
     compile 'org.twitter4j:twitter4j-core:4.0.2'
     compile 'com.google.guava:guava:18.0'
     compile 'org.apmem.tools:layouts:1.8@aar'
+    compile 'joda-time:joda-time:2.7'
 }

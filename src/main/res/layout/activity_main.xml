@@ -4,30 +4,35 @@
     tools:context=".MainActivity" tools:ignore="MergeRootFrame">
 
     <LinearLayout
-        android:orientation="vertical"
+        android:orientation="horizontal"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:padding="16dp"
-        android:background="@color/primary"
+        android:background="@color/primary_light"
         android:id="@+id/linearLayout">
+
         <org.apmem.tools.layouts.FlowLayout
             xmlns:android="http://schemas.android.com/apk/res/android"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/ma_hashtag_container">
+            android:id="@+id/ma_hashtag_container"
+            android:layout_weight="1">
         </org.apmem.tools.layouts.FlowLayout>
 
-        <MultiAutoCompleteTextView
-            android:layout_width="fill_parent"
+        <Spinner
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="New MultiAutoCompleteTextView"
-            android:id="@+id/multiAutoCompleteTextView"
-            android:textColor="#ffffffff" />
+            android:id="@+id/ma_country_sp"
+            style="@style/Base.Widget.AppCompat.Spinner" />
+
     </LinearLayout>
 
-    <GridLayout
+    <GridView
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
+        android:id="@+id/ma_picture_grid"
         android:layout_below="@+id/linearLayout"
-        android:layout_alignParentStart="true"></GridLayout>
+        android:layout_alignParentStart="true"
+        android:padding="16dp" />
+
 </RelativeLayout>
