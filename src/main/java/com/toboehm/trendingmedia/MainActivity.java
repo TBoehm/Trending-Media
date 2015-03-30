@@ -6,13 +6,16 @@ import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.GridView;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import com.toboehm.trendingmedia.trendsproviders.ITrendsDownloadedListener;
-import com.toboehm.trendingmedia.trendsproviders.ITrendsProvider;
+import com.toboehm.trendingmedia.trendsproviders.AbsTrendsProvider;
+import com.toboehm.trendingmedia.trendsproviders.ITrendsProviderStatusListener;
 import com.toboehm.trendingmedia.viewmodels.MainActivityViewModel;
 
 import org.apmem.tools.layouts.FlowLayout;
@@ -26,13 +29,14 @@ import butterknife.InjectView;
 import butterknife.OnItemSelected;
 
 
-public class MainActivity extends ActionBarActivity implements ITrendsDownloadedListener {
+public class MainActivity extends ActionBarActivity implements ITrendsDownloadedListener, ITrendsProviderStatusListener {
 
     // UI elements
     @InjectView(R.id.ma_country_sp) Spinner mCountrySP;
     @InjectView(R.id.ma_hashtag_container) FlowLayout mHashTagContainer;
     @InjectView(R.id.ma_picture_grid) GridView mPictureGrid;
 
+    private final HashButtonClickListener mHashButtonClickListener = new HashButtonClickListener();
 
     // viewModel
     private MainActivityViewModel mViewModel;
@@ -46,7 +50,7 @@ public class MainActivity extends ActionBarActivity implements ITrendsDownloaded
         ButterKnife.inject(this);
 
         // init viewModel
-        mViewModel = new MainActivityViewModel(this);
+        mViewModel = new MainActivityViewModel(this, this);
     }
 
     @Override
@@ -54,6 +58,13 @@ public class MainActivity extends ActionBarActivity implements ITrendsDownloaded
         super.onResume();
 
         initView();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+
     }
 
     private void initView() {
@@ -78,9 +89,9 @@ public class MainActivity extends ActionBarActivity implements ITrendsDownloaded
             mHashTagContainer.removeAllViews();
 
             // request trends based on current location and add them to view model
-            for(ITrendsProvider regionTrendProvider : mViewModel.getTrendsProviders()){
+            for(AbsTrendsProvider regionTrendProvider : mViewModel.getTrendsProviders()){
 
-               if(regionTrendProvider.isReady()){
+               if(regionTrendProvider.getStatus() == AbsTrendsProvider.Status.READY){
 
                    regionTrendProvider.asyncRequestRegionTrends(currentLocation, this);
                }
@@ -117,15 +128,53 @@ public class MainActivity extends ActionBarActivity implements ITrendsDownloaded
     public void onTrendsDownloaded(final HashSet<String> pTrends) {
 
         // add trends to viewmodel
-        mViewModel.addCurrentTrends(pTrends);
+        mViewModel.addTrends(pTrends);
 
         // create new hash view entries
-        for(final String trend : mViewModel.geCurrentTrends()){
+        for(final String trend : mViewModel.geCurrentTrends().keySet()){
 
             final Button trendButton = new Button(this);
+            trendButton.setTextSize(10);
+            trendButton.setTextColor(getResources().getColor(R.color.primary_dark));
             trendButton.setText(trend);
+            trendButton.setOnClickListener(mHashButtonClickListener);
 
             mHashTagContainer.addView(trendButton);
+        }
+    }
+
+    @Override
+    public void onTrendsProviderStatusChanged(AbsTrendsProvider pTrendsProvider,final AbsTrendsProvider.Status pStatus) {
+
+        // if at least one trend provider is ready change visibility of the country spinner to "visible"
+        if((pStatus == AbsTrendsProvider.Status.READY) && (mCountrySP.getVisibility() != View.VISIBLE)){
+
+            mCountrySP.setVisibility(View.VISIBLE);
+
+        }else{
+
+            Toast.makeText(this, "Initialization failed for trends provider " + pTrendsProvider.getName(), Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private class HashButtonClickListener implements Button.OnClickListener{
+
+        @Override
+        public void onClick(View v) {
+
+            final Button hashButton = (Button)v;
+
+            // toggle hashtag state and act on new state
+            if(mViewModel.toggleTrend(hashButton.getText().toString())){
+
+                // if hashtag is active now -> load corresponding media
+                Toast.makeText(MainActivity.this, "Load media for hashtag " + hashButton.getText(), Toast.LENGTH_SHORT).show();
+
+            }else{
+
+                // if hashtag is inactive now -> remove corresponding media
+                Toast.makeText(MainActivity.this, "Remove media for hashtag " + hashButton.getText(), Toast.LENGTH_SHORT).show();
+            }
         }
     }
 }

@@ -29,7 +29,7 @@ import twitter4j.conf.ConfigurationBuilder;
 /**
  * Created by Tobias Boehm on 28.03.2015.
  */
-public class TwitterTrendsProvider implements ITrendsProvider {
+public class TwitterTrendsProvider extends AbsTrendsProvider {
 
     private static final String TWITTER_PREFS_FILE = "TwitterPrefs";
     private static final String TWITTER_TOKEN_TYPE = "TWITTER_TOKEN_TYPE";
@@ -49,7 +49,8 @@ public class TwitterTrendsProvider implements ITrendsProvider {
     private HashMultimap<Integer,String> mCachedTrends = HashMultimap.create();
 
 
-    public TwitterTrendsProvider(final Context pContext){
+    public TwitterTrendsProvider(final Context pContext, final ITrendsProviderStatusListener pTrendsProviderReadyListener){
+        super(pTrendsProviderReadyListener);
 
         // check if access token is available
         final SharedPreferences twitterPreferences = pContext.getSharedPreferences(TWITTER_PREFS_FILE, Context.MODE_PRIVATE);
@@ -101,10 +102,15 @@ public class TwitterTrendsProvider implements ITrendsProvider {
                                 .putString(TWITTER_TOKEN_TYPE, pToken.getTokenType())
                                 .putString(TWITTER_ACCESS_TOKEN, pToken.getAccessToken())
                                 .apply();
-                    }
 
-                    // setup twitter client
-                    setupTwitterClient(pContext, twitterPreferences);
+                        // setup twitter client
+                        setupTwitterClient(pContext, twitterPreferences);
+
+                    }else{
+
+                        mStatus = AbsTrendsProvider.Status.FAILURE;
+                        mProviderIsReadyListener.onTrendsProviderStatusChanged(TwitterTrendsProvider.this, mStatus);
+                    }
 
                     // remove own reference in parent
                     mRunningAsyncTask = null;
@@ -132,8 +138,20 @@ public class TwitterTrendsProvider implements ITrendsProvider {
           .setApplicationOnlyAuthEnabled(true);
 
         mTwitterClient = new TwitterFactory(cb.build()).getInstance();
+
+        // update status
+        mStatus = Status.READY;
+
+        // inform "trend provider is ready" listener
+        mProviderIsReadyListener.onTrendsProviderStatusChanged(this, mStatus);
     }
 
+
+    @Override
+    public String getName() {
+
+        return  "Twitter";
+    }
 
     @Override
     public void asyncRequestRegionTrends(final Address pPlace, final ITrendsDownloadedListener pListener) {
@@ -195,12 +213,6 @@ public class TwitterTrendsProvider implements ITrendsProvider {
         }.execute();
 
 
-    }
-
-    @Override
-    public boolean isReady() {
-
-        return (mTwitterClient != null);
     }
 
     private HashSet<String> getTrends(final int pWOEID){
