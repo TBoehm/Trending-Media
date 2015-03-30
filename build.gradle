@@ -17,6 +17,10 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
+    packagingOptions {
+        exclude 'META-INF/LICENSE.txt'
+    }
 }
 
 dependencies {
@@ -24,7 +28,7 @@ dependencies {
     compile 'com.android.support:appcompat-v7:22.0.0'
     compile 'com.googlecode.flickrj-android:flickrj-android:2.1.0'
     compile 'com.jakewharton:butterknife:6.1.0'
-    compile 'org.twitter4j:twitter4j-core:4.0.2'
+    compile 'org.twitter4j:twitter4j-core:4.0.3'
     compile 'com.google.guava:guava:18.0'
     compile 'org.apmem.tools:layouts:1.8@aar'
     compile 'joda-time:joda-time:2.7'

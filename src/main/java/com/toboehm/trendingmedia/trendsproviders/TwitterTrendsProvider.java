@@ -10,9 +10,7 @@ import com.toboehm.trendingmedia.R;
 
 import org.joda.time.Duration;
 import org.joda.time.Instant;
-import org.joda.time.Interval;
 import org.joda.time.Minutes;
-import org.joda.time.Period;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -42,7 +40,9 @@ public class TwitterTrendsProvider implements ITrendsProvider {
      */
     private static final Duration FIFTEEN_MINUTES = Minutes.minutes(15).toStandardDuration();
 
+    // tools
     private Twitter mTwitterClient;
+    private AsyncTask mRunningAsyncTask;
 
     // cached trend based on WOEID (Integer)
     private HashMap<Integer,Instant> mTimeSinceAccess = new HashMap<>();
@@ -60,8 +60,11 @@ public class TwitterTrendsProvider implements ITrendsProvider {
 
         }else{
 
+            cancelAnyRunningAsyncTask();
+
+
             // if not query access token via async task and then setup the twitter client
-            new AsyncTask<Void,Void,OAuth2Token>(){
+            mRunningAsyncTask = new AsyncTask<Void,Void,OAuth2Token>(){
 
                 @Override
                 protected OAuth2Token doInBackground(Void... params) {
@@ -102,8 +105,19 @@ public class TwitterTrendsProvider implements ITrendsProvider {
 
                     // setup twitter client
                     setupTwitterClient(pContext, twitterPreferences);
+
+                    // remove own reference in parent
+                    mRunningAsyncTask = null;
                 }
             }.execute();
+        }
+    }
+
+    private void cancelAnyRunningAsyncTask() {
+
+        if((mRunningAsyncTask != null) && !mRunningAsyncTask.isCancelled()){
+
+            mRunningAsyncTask.cancel(true);
         }
     }
 
@@ -124,7 +138,7 @@ public class TwitterTrendsProvider implements ITrendsProvider {
     @Override
     public void asyncRequestRegionTrends(final Address pPlace, final ITrendsDownloadedListener pListener) {
 
-        new AsyncTask<Void,Void,HashSet<String>>(){
+        mRunningAsyncTask = new AsyncTask<Void,Void,HashSet<String>>(){
 
             @Override
             protected HashSet<String> doInBackground(Void... params) {
@@ -153,6 +167,10 @@ public class TwitterTrendsProvider implements ITrendsProvider {
             protected void onPostExecute(final HashSet<String> pTrends) {
 
                 pListener.onTrendsDownloaded(pTrends);
+
+
+                // remove own reference in parent
+                mRunningAsyncTask = null;
             }
         }.execute();
     }

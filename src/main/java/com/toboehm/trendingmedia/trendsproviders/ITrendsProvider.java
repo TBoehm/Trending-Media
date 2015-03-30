@@ -2,8 +2,6 @@ package com.toboehm.trendingmedia.trendsproviders;
 
 import android.location.Address;
 
-import java.util.HashSet;
-
 /**
  * Created by Tobias Boehm on 28.03.2015.
  */
