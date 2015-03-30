@@ -21,6 +21,7 @@ import com.toboehm.trendingmedia.viewmodels.MainActivityViewModel;
 import org.apmem.tools.layouts.FlowLayout;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Locale;
 
@@ -127,11 +128,13 @@ public class MainActivity extends ActionBarActivity implements ITrendsDownloaded
     @Override
     public void onTrendsDownloaded(final HashSet<String> pTrends) {
 
+        fixHashPrefixes(pTrends);
+
         // add trends to viewmodel
         mViewModel.addTrends(pTrends);
 
         // create new hash view entries
-        for(final String trend : mViewModel.geCurrentTrends().keySet()){
+        for(final String trend : pTrends){
 
             final Button trendButton = new Button(this);
             trendButton.setTextSize(10);
@@ -141,6 +144,25 @@ public class MainActivity extends ActionBarActivity implements ITrendsDownloaded
 
             mHashTagContainer.addView(trendButton);
         }
+    }
+
+    private void fixHashPrefixes(final HashSet<String> pTrends) {
+
+        final ArrayList<String> fixedTrends = new ArrayList<>();
+        for(String trend : pTrends){
+
+            // add hash if the trend does not already start with a hash
+            if(trend.startsWith("#")){
+
+                fixedTrends.add(trend);
+
+            }else{
+
+                fixedTrends.add("#" + trend);
+            }
+        }
+        pTrends.clear();
+        pTrends.addAll(fixedTrends);
     }
 
     @Override
@@ -162,18 +184,21 @@ public class MainActivity extends ActionBarActivity implements ITrendsDownloaded
         @Override
         public void onClick(View v) {
 
-            final Button hashButton = (Button)v;
+            final Button trendButton = (Button)v;
 
             // toggle hashtag state and act on new state
-            if(mViewModel.toggleTrend(hashButton.getText().toString())){
+            if(mViewModel.toggleTrend(trendButton.getText().toString())){
 
                 // if hashtag is active now -> load corresponding media
-                Toast.makeText(MainActivity.this, "Load media for hashtag " + hashButton.getText(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, "Load media for hashtag " + trendButton.getText(), Toast.LENGTH_SHORT).show();
+
+                trendButton.setBackgroundColor(getResources().getColor(R.color.button_active));
 
             }else{
 
                 // if hashtag is inactive now -> remove corresponding media
-                Toast.makeText(MainActivity.this, "Remove media for hashtag " + hashButton.getText(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, "Remove media for hashtag " + trendButton.getText(), Toast.LENGTH_SHORT).show();
+
             }
         }
     }

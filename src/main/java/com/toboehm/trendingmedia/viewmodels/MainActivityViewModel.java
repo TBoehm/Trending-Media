@@ -56,15 +56,13 @@ public class MainActivityViewModel {
 
         for(String trend : pTrends){
 
-            // add hash if the trend does not already start with a hash
-            if(trend.startsWith("#")){
+            // if the trend does not start with a hash
+            if(!trend.startsWith("#")){
 
-                mCurrentTrends.put(trend, false);
-
-            }else{
-
-                mCurrentTrends.put("#" + trend, false);
+                throw new IllegalArgumentException("Trend string '" + trend + "' was not fixed.");
             }
+
+            mCurrentTrends.put(trend, false);
         }
     }
 
@@ -80,7 +78,7 @@ public class MainActivityViewModel {
 
         }else{
 
-            throw new IllegalStateException("Trend " + pTrend + " is not part of the current model state.");
+            throw new IllegalStateException("Trend '" + pTrend + "' is not part of the current model state.");
         }
     }
 
