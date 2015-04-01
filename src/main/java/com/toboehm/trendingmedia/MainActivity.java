@@ -80,7 +80,8 @@ public class MainActivity extends ActionBarActivity implements ITrendsDownloaded
         // init country button
         mFlagUtils.setFlagDrawable(mViewModel.getCurrentCountryISO().toLowerCase(), mCurrentCountryIB);
 
-        // add hashtag buttons
+        // (re)init hashtag container
+        mHashTagContainer.removeAllViews();
         for(final Map.Entry<String, Boolean> hashTagAndState : mViewModel.geCurrentTrends().entrySet()){
 
             final Button trendButton = new Button(this);
@@ -126,7 +127,10 @@ public class MainActivity extends ActionBarActivity implements ITrendsDownloaded
 
         fixHashPrefixes(pHashTags);
 
-        // add trends to viewmodel
+        // filter out known hashtags
+        pHashTags.removeAll(mViewModel.geCurrentTrends().keySet());
+
+        // add new trends to viewmodel
         mViewModel.addTrends(pHashTags);
 
         // create new hash view entries
