@@ -22,13 +22,12 @@
             android:animateLayoutChanges="true">
         </org.apmem.tools.layouts.FlowLayout>
 
-        <Spinner
+        <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/ma_country_sp"
-            style="@style/Widget.AppCompat.Spinner"
-            android:layout_gravity="center_vertical"
-            android:visibility="gone" />
+            android:id="@+id/ma_current_country_iv"
+            android:minHeight="48dp"
+            android:minWidth="48dp" />
 
     </LinearLayout>
 
