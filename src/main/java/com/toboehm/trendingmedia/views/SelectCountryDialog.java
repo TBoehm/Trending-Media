@@ -14,6 +14,9 @@ import android.widget.ImageView;
 import com.toboehm.trendingmedia.R;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Locale;
 
 import butterknife.ButterKnife;
@@ -48,7 +51,15 @@ public class SelectCountryDialog extends Dialog{
 
     private void initGrid() {
 
-        mCountriesGV.setAdapter(new ArrayAdapter<String>(getContext(), R.layout.abc_list_menu_item_icon, Locale.getISOCountries()){
+        // prepare locale liste which contains only ISO country codes for countries we have flags for
+        final HashSet<String> filteredCountryCodes = new HashSet<>(Arrays.asList(Locale.getISOCountries()));
+        for(String lowerCaseCountryCode : getContext().getResources().getStringArray(R.array.excluded_country_codes)){
+
+            filteredCountryCodes.remove(lowerCaseCountryCode.toUpperCase());
+        }
+
+        // configure grid adapter
+        mCountriesGV.setAdapter(new ArrayAdapter<String>(getContext(), R.layout.abc_list_menu_item_icon, new ArrayList<String>(filteredCountryCodes)){
 
             @Override
             public View getView(int position, View convertView, ViewGroup parent) {

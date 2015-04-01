@@ -8,11 +8,13 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.primitives.Booleans;
+import com.toboehm.trendingmedia.R;
 import com.toboehm.trendingmedia.trendsproviders.AbsTrendsProvider;
 import com.toboehm.trendingmedia.trendsproviders.ITrendsProviderStatusListener;
 import com.toboehm.trendingmedia.trendsproviders.TwitterTrendsProvider;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Locale;
@@ -28,7 +30,7 @@ public class MainActivityViewModel {
     private static final String HASHTAGS_ACTIVE_STATE = "HASHTAGS_ACTIVE_STATE";
 
 
-    private String mCurrentCountryISO = Locale.getDefault().getCountry().toLowerCase();
+    private String mCurrentCountryISO;
     private final HashMap<String, Boolean> mCurrentTrends = new HashMap<>();
     private final ArrayList<AbsTrendsProvider> mTrendsProviders = new ArrayList<>();
 
@@ -39,7 +41,7 @@ public class MainActivityViewModel {
                                   final ITrendsProviderStatusListener pTrendsProviderReadyListener,
                                   final Bundle pSavedInstanceState){
 
-        // check state
+        // check if there is a saved state
         if(pSavedInstanceState != null){
 
             if(pSavedInstanceState.containsKey(COUNTRY_STATE)){
@@ -54,6 +56,15 @@ public class MainActivityViewModel {
 
                     mCurrentTrends.put(hashtags[pos], hashtags_state[pos]);
                 }
+            }
+        }else{
+
+            // set default locale if we have a flag for it. else set USA code
+            mCurrentCountryISO = Locale.getDefault().getCountry().toLowerCase();
+            final HashSet<String> excludedCountryCodes = new HashSet<>(Arrays.asList(pContext.getResources().getStringArray(R.array.excluded_country_codes)));
+            if(excludedCountryCodes.contains(mCurrentCountryISO)){
+
+                mCurrentCountryISO = Locale.US.getCountry().toLowerCase();
             }
         }
 

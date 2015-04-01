@@ -9,4 +9,36 @@
 
     // Asset folders
     <string name="flag_asset_folder_path">flags/</string>
+
+    // Excluded country ISO codes
+    <string-array name="excluded_country_codes">
+        <item>ax</item>
+        <item>bl</item>
+        <item>bq</item>
+        <item>bv</item>
+        <item>cc</item>
+        <item>cw</item>
+        <item>cx</item>
+        <item>fk</item>
+        <item>gf</item>
+        <item>gs</item>
+        <item>hm</item>
+        <item>io</item>
+        <item>mf</item>
+        <item>mp</item>
+        <item>nf</item>
+        <item>nu</item>
+        <item>pm</item>
+        <item>pn</item>
+        <item>sh</item>
+        <item>sj</item>
+        <item>ss</item>
+        <item>sx</item>
+        <item>tf</item>
+        <item>tk</item>
+        <item>um</item>
+        <item>wf</item>
+        <item>yt</item>
+    </string-array>
+
 </resources>
