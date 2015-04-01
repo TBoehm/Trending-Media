@@ -27,15 +27,14 @@ public class HashButtonClickListener implements Button.OnClickListener{
         if(mMainActivity.getViewModel().toggleTrend(trendButton.getText().toString())){
 
             // if hashtag is active now -> load corresponding media
+            trendButton.setTextColor(trendButton.getContext().getResources().getColor(R.color.hashtag_active));
             Toast.makeText(mMainActivity, "Load media for hashtag " + trendButton.getText(), Toast.LENGTH_SHORT).show();
-
-            trendButton.setBackgroundColor(mMainActivity.getResources().getColor(R.color.button_active));
 
         }else{
 
             // if hashtag is inactive now -> remove corresponding media
+            trendButton.setTextColor(trendButton.getContext().getResources().getColor(R.color.hashtag_inactive));
             Toast.makeText(mMainActivity, "Remove media for hashtag " + trendButton.getText(), Toast.LENGTH_SHORT).show();
-
         }
     }
 }

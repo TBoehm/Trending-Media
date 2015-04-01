@@ -27,7 +27,8 @@
             android:layout_height="wrap_content"
             android:id="@+id/ma_current_country_iv"
             android:minHeight="48dp"
-            android:minWidth="48dp" />
+            android:minWidth="48dp"
+            android:layout_gravity="center_vertical" />
 
     </LinearLayout>
 

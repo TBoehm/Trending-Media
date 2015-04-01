@@ -2,7 +2,6 @@ package com.toboehm.trendingmedia.views;
 
 import android.app.Dialog;
 import android.content.Context;
-import android.graphics.drawable.Drawable;
 import android.support.v7.widget.LinearLayoutCompat;
 import android.util.TypedValue;
 import android.view.View;
@@ -12,8 +11,8 @@ import android.widget.GridView;
 import android.widget.ImageView;
 
 import com.toboehm.trendingmedia.R;
+import com.toboehm.trendingmedia.utils.CountryFlagUtils;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -31,11 +30,13 @@ public class SelectCountryDialog extends Dialog{
 
     private final OnCountryFlagClickedListener mCountryFlagClickedListener = new OnCountryFlagClickedListener();
     private final OnCountrySelectedListener mOnCountrySelectedListener;
+    private final CountryFlagUtils mFlagUtils;
 
 
-    public SelectCountryDialog(Context context, final OnCountrySelectedListener pOnCountrySelectedListener) {
-        super(context);
+    public SelectCountryDialog(final Context pContext, final OnCountrySelectedListener pOnCountrySelectedListener) {
+        super(pContext);
 
+        mFlagUtils = new CountryFlagUtils(pContext);
         mOnCountrySelectedListener = pOnCountrySelectedListener;
 
         setContentView(R.layout.dialog_select_country);
@@ -80,15 +81,7 @@ public class SelectCountryDialog extends Dialog{
                 convertView.setTag(countryISOcode);
 
                 // set flag from asset directory
-                try {
-                    final String filename = countryISOcode.toLowerCase() + ".png";
-                    final Drawable flag = Drawable.createFromStream(getContext().getAssets().open(getContext().getString(R.string.flag_asset_folder_path) + filename), filename);
-
-                    ((ImageView) convertView).setImageDrawable(flag);
-
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                mFlagUtils.setFlagDrawable(countryISOcode, (ImageView)convertView);
 
                 return convertView;
             }
@@ -100,13 +93,13 @@ public class SelectCountryDialog extends Dialog{
         @Override
         public void onClick(final View pCountryIB) {
 
-            mOnCountrySelectedListener.onCountrySelected((String)pCountryIB.getTag(), ((ImageView)pCountryIB).getDrawable());
+            mOnCountrySelectedListener.onCountrySelected((String)pCountryIB.getTag());
             dismiss();
         }
     }
 
     public interface OnCountrySelectedListener {
 
-        public void onCountrySelected(final String pCountryISOcode, final Drawable pCountryFlag);
+        public void onCountrySelected(final String pCountryISOcode);
     }
 }

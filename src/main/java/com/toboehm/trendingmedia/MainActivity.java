@@ -1,6 +1,5 @@
 package com.toboehm.trendingmedia;
 
-import android.graphics.drawable.Drawable;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
@@ -16,15 +15,17 @@ import android.widget.Toast;
 import com.toboehm.trendingmedia.trendsproviders.AbsTrendsProvider;
 import com.toboehm.trendingmedia.trendsproviders.ITrendsDownloadedListener;
 import com.toboehm.trendingmedia.trendsproviders.ITrendsProviderStatusListener;
+import com.toboehm.trendingmedia.utils.CountryFlagUtils;
 import com.toboehm.trendingmedia.viewmodels.MainActivityViewModel;
-import com.toboehm.trendingmedia.views.viewlistener.HashButtonClickListener;
 import com.toboehm.trendingmedia.views.SelectCountryDialog;
+import com.toboehm.trendingmedia.views.viewlistener.HashButtonClickListener;
 
 import org.apmem.tools.layouts.FlowLayout;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Map;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -40,6 +41,8 @@ public class MainActivity extends ActionBarActivity implements ITrendsDownloaded
     @InjectView(R.id.ma_hashtag_container) FlowLayout mHashTagContainer;
     @InjectView(R.id.ma_picture_grid) GridView mPictureGrid;
     private final HashButtonClickListener mHashButtonClickListener = new HashButtonClickListener(this);
+    private CountryFlagUtils mFlagUtils = new CountryFlagUtils(this);
+
 
     // viewModel
     private MainActivityViewModel mViewModel;
@@ -75,14 +78,18 @@ public class MainActivity extends ActionBarActivity implements ITrendsDownloaded
     private void initView() {
 
         // init country button
-        try {
-            final String filename = mViewModel.getCurrentCountryISO().toLowerCase() + ".png";
-            final Drawable flag = Drawable.createFromStream(getAssets().open(getString(R.string.flag_asset_folder_path) + filename), filename);
+        mFlagUtils.setFlagDrawable(mViewModel.getCurrentCountryISO().toLowerCase(), mCurrentCountryIB);
 
-            mCurrentCountryIB.setImageDrawable(flag);
+        // add hashtag buttons
+        for(final Map.Entry<String, Boolean> hashTagAndState : mViewModel.geCurrentTrends().entrySet()){
 
-        } catch (IOException e) {
-            e.printStackTrace();
+            final Button trendButton = new Button(this);
+            trendButton.setTextSize(10);
+            trendButton.setTextColor(hashTagAndState.getValue() ? getResources().getColor(R.color.hashtag_active) : getResources().getColor(R.color.hashtag_inactive));
+            trendButton.setText(hashTagAndState.getKey());
+            trendButton.setOnClickListener(mHashButtonClickListener);
+
+            mHashTagContainer.addView(trendButton);
         }
     }
 
@@ -115,25 +122,26 @@ public class MainActivity extends ActionBarActivity implements ITrendsDownloaded
     }
 
     @Override
-    public void onTrendsDownloaded(final HashSet<String> pTrends) {
+    public void onTrendsDownloaded(final HashSet<String> pHashTags) {
 
-        fixHashPrefixes(pTrends);
+        fixHashPrefixes(pHashTags);
 
         // add trends to viewmodel
-        mViewModel.addTrends(pTrends);
+        mViewModel.addTrends(pHashTags);
 
         // create new hash view entries
-        for(final String trend : pTrends){
+        for(final String trend : pHashTags){
 
             final Button trendButton = new Button(this);
             trendButton.setTextSize(10);
-            trendButton.setTextColor(getResources().getColor(R.color.primary_dark));
+            trendButton.setTextColor(getResources().getColor(R.color.hashtag_inactive));
             trendButton.setText(trend);
             trendButton.setOnClickListener(mHashButtonClickListener);
 
             mHashTagContainer.addView(trendButton);
         }
     }
+
 
     private void fixHashPrefixes(final HashSet<String> pTrends) {
 
@@ -162,6 +170,9 @@ public class MainActivity extends ActionBarActivity implements ITrendsDownloaded
 
             mCurrentCountryIB.setVisibility(View.VISIBLE);
 
+            // manually trigger on country selected
+            onCountrySelected(mViewModel.getCurrentCountryISO());
+
         }else{
 
             Toast.makeText(this, "Initialization failed for trends provider " + pTrendsProvider.getName(), Toast.LENGTH_LONG).show();
@@ -173,10 +184,10 @@ public class MainActivity extends ActionBarActivity implements ITrendsDownloaded
     }
 
     @Override
-    public void onCountrySelected(final String pCountryISOcode, final Drawable pCountryFlag) {
+    public void onCountrySelected(final String pCountryISOcode) {
 
         mViewModel.setCurrentLocation(pCountryISOcode);
-        mCurrentCountryIB.setImageDrawable(pCountryFlag);
+        mFlagUtils.setFlagDrawable(pCountryISOcode, mCurrentCountryIB);
 
         try {
             // get address based on ISO country

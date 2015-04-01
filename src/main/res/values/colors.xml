@@ -4,8 +4,8 @@
     <color name="primary_dark">#044B94</color>
     <color name="primary_light">#1775D6</color>
     <color name="accent">#FF2300</color>
-    <color name="button_active">#00D440</color>
-    <color name="button_inactive">#525452</color>
+    <color name="hashtag_active">#1775D6</color>
+    <color name="hashtag_inactive">#525452</color>
 
 
 </resources>
