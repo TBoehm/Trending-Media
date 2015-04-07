@@ -1,9 +1,12 @@
 package com.toboehm.trendingmedia.views;
 
 import android.app.Dialog;
+import android.app.DialogFragment;
 import android.content.Context;
+import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutCompat;
 import android.util.TypedValue;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -13,6 +16,7 @@ import android.widget.ImageView;
 import com.toboehm.trendingmedia.R;
 import com.toboehm.trendingmedia.utils.CountryFlagUtils;
 
+import java.lang.Override;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -24,7 +28,7 @@ import butterknife.InjectView;
 /**
  * Created by Tobias Boehm on 31.03.2015.
  */
-public class SelectCountryDialog extends Dialog{
+public class SelectCountryDialog extends DialogFragment{
 
     @InjectView(R.id.scd_gridview) GridView mCountriesGV;
 
@@ -33,13 +37,18 @@ public class SelectCountryDialog extends Dialog{
     private final CountryFlagUtils mFlagUtils;
 
 
-    public SelectCountryDialog(final Context pContext, final OnCountrySelectedListener pOnCountrySelectedListener) {
-        super(pContext);
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
 
         mFlagUtils = new CountryFlagUtils(pContext);
         mOnCountrySelectedListener = pOnCountrySelectedListener;
+    }
 
-        setContentView(R.layout.dialog_select_country);
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+
+        final View dialogView = inflater.inflate(R.layout.dialog_select_country, container);
         ButterKnife.inject(this);
 
         // dialog will fill the screen horizontally
@@ -48,6 +57,15 @@ public class SelectCountryDialog extends Dialog{
         setTitle(R.string.select_country_dialog_title);
 
         initGrid();
+
+        return dialogView;
+    }
+
+    public SelectCountryDialog(final Context pContext, final OnCountrySelectedListener pOnCountrySelectedListener) {
+        super(pContext);
+
+        setContentView(R.layout.dialog_select_country);
+
     }
 
     private void initGrid() {

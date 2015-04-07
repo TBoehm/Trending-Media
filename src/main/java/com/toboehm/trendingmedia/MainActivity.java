@@ -1,5 +1,6 @@
 package com.toboehm.trendingmedia;
 
+import android.app.FragmentManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
@@ -59,6 +60,7 @@ public class MainActivity extends ActionBarActivity implements ITrendsDownloaded
         // init viewModel
         mViewModel = new MainActivityViewModel(this, this, savedInstanceState);
     }
+
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
