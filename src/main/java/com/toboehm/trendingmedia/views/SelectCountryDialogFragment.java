@@ -1,10 +1,9 @@
 package com.toboehm.trendingmedia.views;
 
+import android.app.Activity;
 import android.app.Dialog;
 import android.app.DialogFragment;
-import android.content.Context;
 import android.os.Bundle;
-import android.support.v7.widget.LinearLayoutCompat;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,7 +15,6 @@ import android.widget.ImageView;
 import com.toboehm.trendingmedia.R;
 import com.toboehm.trendingmedia.utils.CountryFlagUtils;
 
-import java.lang.Override;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -28,57 +26,74 @@ import butterknife.InjectView;
 /**
  * Created by Tobias Boehm on 31.03.2015.
  */
-public class SelectCountryDialog extends DialogFragment{
+public class SelectCountryDialogFragment extends DialogFragment{
 
     @InjectView(R.id.scd_gridview) GridView mCountriesGV;
 
     private final OnCountryFlagClickedListener mCountryFlagClickedListener = new OnCountryFlagClickedListener();
-    private final OnCountrySelectedListener mOnCountrySelectedListener;
-    private final CountryFlagUtils mFlagUtils;
+    private OnCountrySelectedListener mOnCountrySelectedListener;
+    private CountryFlagUtils mFlagUtils;
 
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mFlagUtils = new CountryFlagUtils(pContext);
-        mOnCountrySelectedListener = pOnCountrySelectedListener;
+        mFlagUtils = new CountryFlagUtils(getActivity());
+    }
+
+    @Override
+    public Dialog onCreateDialog(Bundle savedInstanceState) {
+
+        final Dialog dialog = super.onCreateDialog(savedInstanceState);
+
+        dialog.setTitle(R.string.select_country_dialog_title);
+
+        return dialog;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        // dialog will fill the screen horizontally
+        getDialog().getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+
+        try {
+            mOnCountrySelectedListener = (OnCountrySelectedListener) activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString()
+                    + " must implement OnCountrySelectedListener");
+        }
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         final View dialogView = inflater.inflate(R.layout.dialog_select_country, container);
-        ButterKnife.inject(this);
-
-        // dialog will fill the screen horizontally
-        getWindow().setLayout(LinearLayoutCompat.LayoutParams.MATCH_PARENT, LinearLayoutCompat.LayoutParams.WRAP_CONTENT);
-
-        setTitle(R.string.select_country_dialog_title);
+        ButterKnife.inject(this,dialogView);
 
         initGrid();
 
         return dialogView;
     }
 
-    public SelectCountryDialog(final Context pContext, final OnCountrySelectedListener pOnCountrySelectedListener) {
-        super(pContext);
-
-        setContentView(R.layout.dialog_select_country);
-
-    }
-
     private void initGrid() {
 
         // prepare locale liste which contains only ISO country codes for countries we have flags for
         final HashSet<String> filteredCountryCodes = new HashSet<>(Arrays.asList(Locale.getISOCountries()));
-        for(String lowerCaseCountryCode : getContext().getResources().getStringArray(R.array.excluded_country_codes)){
+        for(String lowerCaseCountryCode : getResources().getStringArray(R.array.excluded_country_codes)){
 
             filteredCountryCodes.remove(lowerCaseCountryCode.toUpperCase());
         }
 
         // configure grid adapter
-        mCountriesGV.setAdapter(new ArrayAdapter<String>(getContext(), R.layout.abc_list_menu_item_icon, new ArrayList<String>(filteredCountryCodes)){
+        mCountriesGV.setAdapter(new ArrayAdapter<String>(getActivity(), R.layout.abc_list_menu_item_icon, new ArrayList<String>(filteredCountryCodes)){
 
             @Override
             public View getView(int position, View convertView, ViewGroup parent) {

@@ -1,6 +1,5 @@
 package com.toboehm.trendingmedia;
 
-import android.app.FragmentManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
@@ -18,7 +17,7 @@ import com.toboehm.trendingmedia.trendsproviders.ITrendsDownloadedListener;
 import com.toboehm.trendingmedia.trendsproviders.ITrendsProviderStatusListener;
 import com.toboehm.trendingmedia.utils.CountryFlagUtils;
 import com.toboehm.trendingmedia.viewmodels.MainActivityViewModel;
-import com.toboehm.trendingmedia.views.SelectCountryDialog;
+import com.toboehm.trendingmedia.views.SelectCountryDialogFragment;
 import com.toboehm.trendingmedia.views.viewlistener.HashButtonClickListener;
 
 import org.apmem.tools.layouts.FlowLayout;
@@ -35,7 +34,7 @@ import butterknife.OnClick;
 
 public class MainActivity extends ActionBarActivity implements ITrendsDownloadedListener,
                                                                 ITrendsProviderStatusListener,
-                                                                SelectCountryDialog.OnCountrySelectedListener {
+                                                                SelectCountryDialogFragment.OnCountrySelectedListener {
 
     // UI elements
     @InjectView(R.id.ma_current_country_iv) ImageView mCurrentCountryIB;
@@ -99,7 +98,9 @@ public class MainActivity extends ActionBarActivity implements ITrendsDownloaded
     @OnClick(R.id.ma_current_country_iv)
     void onCountryChooserClicked(){
 
-        new SelectCountryDialog(MainActivity.this, this).show();
+        final SelectCountryDialogFragment selectCountryDialogFragment = new SelectCountryDialogFragment();
+
+        selectCountryDialogFragment.show(getFragmentManager(), SelectCountryDialogFragment.class.getName());
     }
 
     @Override

@@ -2,7 +2,6 @@ package com.toboehm.trendingmedia.mediaproviders;
 
 import android.content.Context;
 import android.graphics.drawable.BitmapDrawable;
-import android.os.AsyncTask;
 
 import com.googlecode.flickrjandroid.Flickr;
 import com.googlecode.flickrjandroid.FlickrException;
@@ -29,9 +28,6 @@ public class FlickrPictureProvider implements IMediaProvider<BitmapDrawable> {
 
     @Override
     public void requestMediaForTrend(String pTrend, IMediaDownloadListener<BitmapDrawable> pListener) {
-
-
-        new AsyncTask<Void,Void,>()
 
         final SearchParameters searchParameters = new SearchParameters();
         searchParameters.setText(pTrend);
