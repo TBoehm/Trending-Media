@@ -26,3 +26,8 @@ proguard/
 # Log Files
 *.log
 /src/main/res/values/private_properties.xml
+
+// Idea
+/.idea/workspace.xml
+/.idea/libraries
+.DS_Store
