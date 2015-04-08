@@ -1,6 +1,5 @@
-package com.toboehm.trendingmedia.views;
+package com.toboehm.trendingmedia.activities.dialogs;
 
-import android.app.Activity;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.os.Bundle;
@@ -31,7 +30,6 @@ public class SelectCountryDialogFragment extends DialogFragment{
     @InjectView(R.id.scd_gridview) GridView mCountriesGV;
 
     private final OnCountryFlagClickedListener mCountryFlagClickedListener = new OnCountryFlagClickedListener();
-    private OnCountrySelectedListener mOnCountrySelectedListener;
     private CountryFlagUtils mFlagUtils;
 
 
@@ -58,18 +56,6 @@ public class SelectCountryDialogFragment extends DialogFragment{
 
         // dialog will fill the screen horizontally
         getDialog().getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-    }
-
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-
-        try {
-            mOnCountrySelectedListener = (OnCountrySelectedListener) activity;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString()
-                    + " must implement OnCountrySelectedListener");
-        }
     }
 
     @Override
@@ -126,7 +112,17 @@ public class SelectCountryDialogFragment extends DialogFragment{
         @Override
         public void onClick(final View pCountryIB) {
 
-            mOnCountrySelectedListener.onCountrySelected((String)pCountryIB.getTag());
+            try {
+                // Instantiate the EditDateDialogListener so we can send events to the host
+                final OnCountrySelectedListener onCountrySelectedListener = (OnCountrySelectedListener) getTargetFragment();
+                onCountrySelectedListener.onCountrySelected((String)pCountryIB.getTag());
+
+            } catch (ClassCastException e) {
+
+                // The activity doesn't implement the interface, throw exception
+                throw new ClassCastException(getTargetFragment().toString() + " must implement OnCountrySelectedListener");
+            }
+
             dismiss();
         }
     }

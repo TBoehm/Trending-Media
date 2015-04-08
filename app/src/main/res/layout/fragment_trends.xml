@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="horizontal"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:padding="16dp"
+    android:background="@color/primary_light"
+    android:id="@+id/linearLayout"
+    android:animateLayoutChanges="true"
+    tools:showIn="@layout/activity_main">
+
+    <org.apmem.tools.layouts.FlowLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/tf_hashtag_container"
+        android:layout_weight="1"
+        android:animateLayoutChanges="true"></org.apmem.tools.layouts.FlowLayout>
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/tf_current_country_iv"
+        android:minHeight="48dp"
+        android:minWidth="48dp"
+        android:layout_gravity="center_vertical" />
+
+</LinearLayout>
