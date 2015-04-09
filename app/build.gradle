@@ -32,4 +32,6 @@ dependencies {
     compile 'com.google.guava:guava:18.0'
     compile 'org.apmem.tools:layouts:1.8@aar'
     compile 'joda-time:joda-time:2.7'
+    compile 'com.squareup.picasso:picasso:2.5.2'
+    compile 'org.slf4j:slf4j-log4j12:1.7.12'
 }

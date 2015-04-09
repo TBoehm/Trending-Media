@@ -6,6 +6,7 @@ import android.app.Fragment;
 import android.content.Intent;
 import android.location.Address;
 import android.location.Geocoder;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -212,11 +213,11 @@ public class TrendsFragment extends Fragment implements ITrendsProviderStatusLis
             // inform activity about trend changes
             if(stateNew){
 
-                mTrendStateChangedListener.activateTrend(pTrend);
+                mTrendStateChangedListener.onTrendActivated(pTrend);
 
             }else{
 
-                mTrendStateChangedListener.deactivateTrend(pTrend);
+                mTrendStateChangedListener.onTrendDeactivated(pTrend);
             }
 
             return stateNew;
@@ -297,26 +298,45 @@ public class TrendsFragment extends Fragment implements ITrendsProviderStatusLis
         mCurrentCountryCode = pCountryISOcode;
         mFlagUtils.setFlagDrawable(pCountryISOcode, mCurrentCountryIB);
 
-        try {
-            // get address based on ISO country
-            final Address currentLocation = new Geocoder(getActivity()).getFromLocationName(pCountryISOcode, 1).get(0);
+        new AsyncTask<Void, Void, Address>(){
 
-            // clear old trends
-            mCurrentTrends.clear();
-            mHashTagContainer.removeAllViews();
+            @Override
+            protected Address doInBackground(Void... params) {
 
-            // request trends based on current location and add them to view model
-            for(AbsTrendsProvider regionTrendProvider : mTrendsProviders){
+                try {
+                    // get address based on ISO country
+                    return new Geocoder(getActivity()).getFromLocationName(pCountryISOcode, 1).get(0);
 
-                if(regionTrendProvider.getStatus() == AbsTrendsProvider.Status.READY){
+                } catch (IOException e) {
+                    e.printStackTrace();
 
-                    regionTrendProvider.asyncRequestRegionTrends(currentLocation, this);
+                    return null;
                 }
             }
 
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+            @Override
+            protected void onPostExecute(final Address pCurrentLocation) {
+
+                if(pCurrentLocation != null){
+
+                    // clear old trends and their representation in this fragment
+                    mCurrentTrends.clear();
+                    mHashTagContainer.removeAllViews();
+
+                    // clear active trends in activity
+                    mTrendStateChangedListener.onTrendsCleared();
+
+                    // request trends based on current location and add them to view model
+                    for(AbsTrendsProvider regionTrendProvider : mTrendsProviders){
+
+                        if(regionTrendProvider.getStatus() == AbsTrendsProvider.Status.READY){
+
+                            regionTrendProvider.asyncRequestRegionTrends(pCurrentLocation, TrendsFragment.this);
+                        }
+                    }
+                }
+            }
+        }.execute();
     }
 
 
@@ -348,8 +368,10 @@ public class TrendsFragment extends Fragment implements ITrendsProviderStatusLis
 
     public interface TrendStateChangedListener {
 
-        public void activateTrend(final String pTrend);
+        public void onTrendActivated(final String pTrend);
 
-        public void deactivateTrend(final String pTrend);
+        public void onTrendDeactivated(final String pTrend);
+
+        public void onTrendsCleared();
     }
 }

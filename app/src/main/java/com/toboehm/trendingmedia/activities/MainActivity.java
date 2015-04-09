@@ -6,21 +6,21 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.toboehm.trendingmedia.R;
+import com.toboehm.trendingmedia.activities.fragments.MediaFragment;
 import com.toboehm.trendingmedia.activities.fragments.TrendsFragment;
-
-import java.util.HashSet;
 
 
 public class MainActivity extends ActionBarActivity implements TrendsFragment.TrendStateChangedListener {
 
-    private final HashSet<String> mActiveTrends = new HashSet<>();
-
+    private MediaFragment mMediaFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
+
+        mMediaFragment = (MediaFragment) getFragmentManager().findFragmentById(R.id.ma_media_fragment);
     }
 
     @Override
@@ -46,14 +46,20 @@ public class MainActivity extends ActionBarActivity implements TrendsFragment.Tr
     }
 
     @Override
-    public void activateTrend(String pTrend) {
+    public void onTrendActivated(String pTrend) {
 
-        mActiveTrends.add(pTrend);
+        mMediaFragment.addPicturesForTrend(pTrend);
     }
 
     @Override
-    public void deactivateTrend(String pTrend) {
+    public void onTrendDeactivated(String pTrend) {
 
-        mActiveTrends.remove(pTrend);
+        mMediaFragment.removePicturesForTrend(pTrend);
+    }
+
+    @Override
+    public void onTrendsCleared() {
+
+        mMediaFragment.removeAllPictures();
     }
 }
