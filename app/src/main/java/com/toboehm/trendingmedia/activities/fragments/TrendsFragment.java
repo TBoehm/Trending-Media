@@ -160,13 +160,18 @@ public class TrendsFragment extends Fragment implements ITrendsProviderStatusLis
     public void onResume() {
         super.onResume();
 
-        initView();
+        // if we have model data re-init ivew
+        if((mCurrentCountryCode != null) && !mCurrentTrends.isEmpty()){
+
+            reInitView();
+        }
     }
 
-    private void initView() {
+    private void reInitView() {
 
         // init country button
         mFlagUtils.setFlagDrawable(mCurrentCountryCode, mCurrentCountryIB);
+        mCurrentCountryIB.setVisibility(View.VISIBLE);
 
         // (re)init hashtag container
         mHashTagContainer.removeAllViews();
@@ -180,6 +185,7 @@ public class TrendsFragment extends Fragment implements ITrendsProviderStatusLis
 
             mHashTagContainer.addView(trendButton);
         }
+
     }
 
     @OnClick(R.id.tf_current_country_iv)
@@ -233,19 +239,23 @@ public class TrendsFragment extends Fragment implements ITrendsProviderStatusLis
     @Override
     public void onTrendsProviderStatusChanged(AbsTrendsProvider pTrendsProvider,final AbsTrendsProvider.Status pStatus) {
 
-        // if at least one trend provider is ready change visibility of the country spinner to "visible"
-        if((pStatus == AbsTrendsProvider.Status.READY) && (mCurrentCountryIB.getVisibility() != View.VISIBLE)){
+        // manual country selection and trends download should be triggered only if we have no model data
+        if(mCurrentTrends.isEmpty()){
 
-            mCurrentCountryIB.setVisibility(View.VISIBLE);
+            // if at least one trend provider is ready change visibility of the country spinner to "visible"
+            if((pStatus == AbsTrendsProvider.Status.READY) && (mCurrentCountryIB.getVisibility() != View.VISIBLE)){
 
-            // manually trigger on country selected
-            onCountrySelected(mCurrentCountryCode);
+                mCurrentCountryIB.setVisibility(View.VISIBLE);
 
-        }else{
+                // manually trigger on country selected
+                onCountrySelected(mCurrentCountryCode);
 
-            Toast.makeText(getActivity(),
-                            "Initialization failed for trends provider " + pTrendsProvider.getName(),
-                            Toast.LENGTH_LONG).show();
+            }else{
+
+                Toast.makeText(getActivity(),
+                        "Initialization failed for trends provider " + pTrendsProvider.getName(),
+                        Toast.LENGTH_LONG).show();
+            }
         }
     }
 
