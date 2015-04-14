@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.google.common.primitives.Booleans;
@@ -57,6 +58,7 @@ public class TrendsFragment extends Fragment implements ITrendsProviderStatusLis
     // UI
     @InjectView(R.id.tf_current_country_iv) ImageView mCurrentCountryIB;
     @InjectView(R.id.tf_hashtag_container)  FlowLayout mHashTagContainer;
+    @InjectView(R.id.tf_loading_trends_pb)  ProgressBar mTrendsLoaderPB;
     private final HashButtonClickListener mHashButtonClickListener = new HashButtonClickListener();
 
 
@@ -250,6 +252,9 @@ public class TrendsFragment extends Fragment implements ITrendsProviderStatusLis
     @Override
     public void onTrendsDownloaded(final HashSet<String> pHashTags) {
 
+        // hide trends loader progress wheel
+        mTrendsLoaderPB.setVisibility(View.INVISIBLE);
+
         fixHashPrefixes(pHashTags);
 
         // filter out known hashtags
@@ -295,9 +300,14 @@ public class TrendsFragment extends Fragment implements ITrendsProviderStatusLis
     @Override
     public void onCountrySelected(final String pCountryISOcode) {
 
+        // update model, set new country flag
         mCurrentCountryCode = pCountryISOcode;
         mFlagUtils.setFlagDrawable(pCountryISOcode, mCurrentCountryIB);
 
+        // show progress wheel
+        mTrendsLoaderPB.setVisibility(View.VISIBLE);
+
+        // asyn get "Address" for current country code; after that start async request for trends
         new AsyncTask<Void, Void, Address>(){
 
             @Override

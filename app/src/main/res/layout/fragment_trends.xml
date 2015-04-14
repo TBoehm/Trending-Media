@@ -17,12 +17,32 @@
         android:layout_weight="1"
         android:animateLayoutChanges="true"></org.apmem.tools.layouts.FlowLayout>
 
-    <ImageView
+    <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/tf_current_country_iv"
-        android:minHeight="48dp"
-        android:minWidth="48dp"
-        android:layout_gravity="center_vertical" />
+        android:layout_gravity="center_vertical">
+
+        <ProgressBar
+            style="?android:attr/progressBarStyleLarge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/tf_loading_trends_pb"
+            android:indeterminate="true"
+            android:layout_centerInParent="true"
+            android:visibility="invisible"
+            android:minHeight="96dp"
+            android:minWidth="96dp" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/tf_current_country_iv"
+            android:minHeight="48dp"
+            android:minWidth="48dp"
+            android:layout_gravity="center_vertical"
+            android:layout_centerVertical="true"
+            android:layout_centerHorizontal="true"
+            android:visibility="invisible" />
+    </RelativeLayout>
 
 </LinearLayout>
