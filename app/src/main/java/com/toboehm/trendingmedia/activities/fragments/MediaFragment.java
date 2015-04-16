@@ -15,9 +15,8 @@ import android.widget.ImageView;
 
 import com.squareup.picasso.Picasso;
 import com.toboehm.trendingmedia.R;
-import com.toboehm.trendingmedia.mediaproviders.FlickrPictureProvider;
-import com.toboehm.trendingmedia.mediaproviders.IMediaProvider;
-import com.toboehm.trendingmedia.mediaproviders.IMediaURIsDownloadListener;
+import com.toboehm.trendingmedia.mediaproviders.AbsMediaProvider;
+import com.toboehm.trendingmedia.mediaproviders.MediaProvidersManager;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -29,14 +28,14 @@ import butterknife.InjectView;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class MediaFragment extends Fragment implements IMediaURIsDownloadListener {
+public class MediaFragment extends Fragment implements AbsMediaProvider.IMediaURIsDownloadListener {
 
     // UI elements
     @InjectView(R.id.mf_picture_grid) GridView mPictureGrid;
     private UriArrayAdapter mURIarrayAdapter;
 
     // Model
-    private final ArrayList<IMediaProvider> mMediaProviders = new ArrayList<>();
+    private MediaProvidersManager mMediaProvidersManager;
     private final List<Uri> mPictureURIs = Collections.synchronizedList(new ArrayList<Uri>());
 
 
@@ -51,8 +50,8 @@ public class MediaFragment extends Fragment implements IMediaURIsDownloadListene
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // add media providers
-        mMediaProviders.add(new FlickrPictureProvider(getActivity()));
+        // init media provider manager
+        mMediaProvidersManager = new MediaProvidersManager(getActivity(), this);
     }
 
     @Override
@@ -71,18 +70,12 @@ public class MediaFragment extends Fragment implements IMediaURIsDownloadListene
 
     public void addPicturesForTrend(final String pTrend) {
 
-        for(IMediaProvider mediaProvider : mMediaProviders){
-
-            mediaProvider.asyncRequestMediaForTrend(pTrend, this);
-        }
+        mMediaProvidersManager.asyncRequestMedia(pTrend);
     }
 
     public void removePicturesForTrend(final String pTrend) {
 
-        for(IMediaProvider mediaProvider : mMediaProviders){
-
-            mediaProvider.cancelMediaRequestsForTrend(pTrend);
-        }
+        mMediaProvidersManager.cancelMediaRequests(pTrend);
 
         // TODO remove specific pictures
         mURIarrayAdapter.notifyDataSetChanged();
@@ -90,10 +83,7 @@ public class MediaFragment extends Fragment implements IMediaURIsDownloadListene
 
     public void removeAllPictures() {
 
-        for(IMediaProvider mediaProvider : mMediaProviders){
-
-            mediaProvider.cancelAllMediaRequests();
-        }
+        mMediaProvidersManager.cancelAllMediaRequests();
 
         mPictureURIs.clear();
         mURIarrayAdapter.notifyDataSetChanged();

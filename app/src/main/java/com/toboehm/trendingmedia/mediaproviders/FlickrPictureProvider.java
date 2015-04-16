@@ -21,10 +21,7 @@ import java.util.Map;
 /**
  * Created by Tobias Boehm on 30.03.2015.
  */
-public class FlickrPictureProvider implements IMediaProvider {
-
-    private static final int MAX_PICTURES_PER_QUERY = 512;
-
+public class FlickrPictureProvider extends AbsMediaProvider {
 
     private final Map<String, AsyncTask<Void,Void,ArrayList<Uri>>> mAsyncMediaRequestTasks = Collections.synchronizedMap(new HashMap<String, AsyncTask<Void, Void, ArrayList<Uri>>>());
     private final Flickr mFlickr;
@@ -37,7 +34,7 @@ public class FlickrPictureProvider implements IMediaProvider {
 
 
     @Override
-    public synchronized void asyncRequestMediaForTrend(final String pTrend, final IMediaURIsDownloadListener pListener) {
+    public synchronized void asyncRequestMediaForTrend(final String pTrend, final IMediaURIsDownloadListener pListener, final int pMaxPicturesPerQuery) {
 
         // check if there is already a running task for that trend.
         if(mAsyncMediaRequestTasks.containsKey(pTrend)){
@@ -63,7 +60,7 @@ public class FlickrPictureProvider implements IMediaProvider {
                         searchParameters.setSort(SearchParameters.RELEVANCE);
                         searchParameters.setMedia("photos");
 
-                        final PhotoList photoList = mFlickr.getPhotosInterface().search(searchParameters, MAX_PICTURES_PER_QUERY, 1);
+                        final PhotoList photoList = mFlickr.getPhotosInterface().search(searchParameters, pMaxPicturesPerQuery, 1);
 
                         // extract URIs from photoList
                         for(int pos = 0; pos < photoList.size(); pos++){
