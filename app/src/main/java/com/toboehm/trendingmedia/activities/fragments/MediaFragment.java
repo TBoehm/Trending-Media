@@ -64,13 +64,14 @@ public class MediaFragment extends Fragment implements AbsMediaProvider.IMediaUR
         // init media provider manager
         mMediaProvidersManager = new MediaProvidersManager(getActivity(), this);
 
+
         // if there is a saved state which contains a trends -> content URIs map; load that state
         if((savedInstanceState != null) && savedInstanceState.containsKey(TRENDS_URIS_STATE)){
 
-            final HashMap<String,Collection<Uri>> trendsPictures = (HashMap<String, Collection<Uri>>) savedInstanceState.getSerializable(TRENDS_URIS_STATE);
-            for(String trend : trendsPictures.keySet()){
+            final HashMap<String,Collection<Uri>> trendsMediaURIs = (HashMap<String, Collection<Uri>>) savedInstanceState.getSerializable(TRENDS_URIS_STATE);
+            for(String trend : trendsMediaURIs.keySet()){
 
-                mTrendsPictures.putAll(trend, trendsPictures.get(trend));
+                mTrendsPictures.putAll(trend, trendsMediaURIs.get(trend));
             }
 
             // filter duplicate URIs and update GUI array adapter with them
@@ -121,7 +122,6 @@ public class MediaFragment extends Fragment implements AbsMediaProvider.IMediaUR
 
     public void removeAllPictures() {
 
-
         mMediaProvidersManager.cancelAllMediaRequests();
 
         mTrendsPictures.clear();
@@ -131,8 +131,8 @@ public class MediaFragment extends Fragment implements AbsMediaProvider.IMediaUR
     @Override
     public void onMediaURIsDownloaded(final String pTrend, final ArrayList<Uri> pMediaURIs) {
 
-        // TODO save pictures based on trends
         mTrendsPictures.putAll(pTrend, pMediaURIs);
+        // TODO filter URIs which are already managed by the array adapter
         mURIarrayAdapter.addAll(pMediaURIs);
     }
 
