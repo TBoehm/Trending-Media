@@ -13,14 +13,18 @@ import android.widget.ArrayAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
 
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.Multimaps;
 import com.squareup.picasso.Picasso;
 import com.toboehm.trendingmedia.R;
 import com.toboehm.trendingmedia.mediaproviders.AbsMediaProvider;
 import com.toboehm.trendingmedia.mediaproviders.MediaProvidersManager;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -30,14 +34,21 @@ import butterknife.InjectView;
  */
 public class MediaFragment extends Fragment implements AbsMediaProvider.IMediaURIsDownloadListener {
 
+    private static final String TRENDS_URIS_STATE = "TRENDS_URIS_STATE";
+
+
     // UI elements
     @InjectView(R.id.mf_picture_grid) GridView mPictureGrid;
     private UriArrayAdapter mURIarrayAdapter;
 
     // Model
-    private MediaProvidersManager mMediaProvidersManager;
-    private final List<Uri> mPictureURIs = Collections.synchronizedList(new ArrayList<Uri>());
+    /**
+     * A multimap for tracing media content related to the trends used to query them.
+     */
+    private final Multimap<String, Uri> mTrendsPictures = Multimaps.synchronizedMultimap(HashMultimap.<String, Uri>create());
 
+    // Utils
+    private MediaProvidersManager mMediaProvidersManager;
 
     @Override
     public void onAttach(Activity activity) {
@@ -52,6 +63,30 @@ public class MediaFragment extends Fragment implements AbsMediaProvider.IMediaUR
 
         // init media provider manager
         mMediaProvidersManager = new MediaProvidersManager(getActivity(), this);
+
+        // if there is a saved state which contains a trends -> content URIs map; load that state
+        if((savedInstanceState != null) && savedInstanceState.containsKey(TRENDS_URIS_STATE)){
+
+            final HashMap<String,Collection<Uri>> trendsPictures = (HashMap<String, Collection<Uri>>) savedInstanceState.getSerializable(TRENDS_URIS_STATE);
+            for(String trend : trendsPictures.keySet()){
+
+                mTrendsPictures.putAll(trend, trendsPictures.get(trend));
+            }
+
+            // filter duplicate URIs and update GUI array adapter with them
+            final HashSet<Uri> filteredURIs = new HashSet<>(mTrendsPictures.values());
+            mURIarrayAdapter.addAll(filteredURIs);
+        }
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+
+        // save the trends -> content URIs state in form of a simple hashmap
+        final HashMap<String,Collection<Uri>> trendsPicturesMap = new HashMap(mTrendsPictures.asMap());
+        outState.putSerializable(TRENDS_URIS_STATE,trendsPicturesMap);
+
+        super.onSaveInstanceState(outState);
     }
 
     @Override
@@ -77,30 +112,34 @@ public class MediaFragment extends Fragment implements AbsMediaProvider.IMediaUR
 
         mMediaProvidersManager.cancelMediaRequests(pTrend);
 
-        // TODO remove specific pictures
-        mURIarrayAdapter.notifyDataSetChanged();
+        // remove media URIs related to that trend from model and remove them from the adapter as well
+        for(Uri mediaURI : mTrendsPictures.removeAll(pTrend)){
+
+            mURIarrayAdapter.remove(mediaURI);
+        }
     }
 
     public void removeAllPictures() {
 
+
         mMediaProvidersManager.cancelAllMediaRequests();
 
-        mPictureURIs.clear();
-        mURIarrayAdapter.notifyDataSetChanged();
+        mTrendsPictures.clear();
+        mURIarrayAdapter.clear();
     }
 
     @Override
-    public void onMediaURIsDownloaded(String pTrend, ArrayList<Uri> pMedia) {
+    public void onMediaURIsDownloaded(final String pTrend, final ArrayList<Uri> pMediaURIs) {
 
         // TODO save pictures based on trends
-        mPictureURIs.addAll(pMedia);
-        mURIarrayAdapter.notifyDataSetChanged();
+        mTrendsPictures.putAll(pTrend, pMediaURIs);
+        mURIarrayAdapter.addAll(pMediaURIs);
     }
 
     private class UriArrayAdapter extends ArrayAdapter<Uri> {
 
         public UriArrayAdapter(final Context pContext) {
-            super(pContext, R.layout.support_simple_spinner_dropdown_item, MediaFragment.this.mPictureURIs);
+            super(pContext, R.layout.support_simple_spinner_dropdown_item);
         }
 
         @Override
