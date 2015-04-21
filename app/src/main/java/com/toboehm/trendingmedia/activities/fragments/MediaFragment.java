@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
@@ -39,6 +40,7 @@ public class MediaFragment extends Fragment implements AbsMediaProvider.IMediaUR
 
     // UI elements
     @InjectView(R.id.mf_picture_grid) GridView mPictureGrid;
+    @InjectView(R.id.mf_loading_imagesources_pb) ProgressBar mImageResourceLoaderPB;
     private UriArrayAdapter mURIarrayAdapter;
 
     // Model
@@ -107,6 +109,7 @@ public class MediaFragment extends Fragment implements AbsMediaProvider.IMediaUR
     public void addPicturesForTrend(final String pTrend) {
 
         mMediaProvidersManager.asyncRequestMedia(pTrend);
+        mImageResourceLoaderPB.setVisibility(View.VISIBLE);
     }
 
     public void removePicturesForTrend(final String pTrend) {
@@ -130,6 +133,8 @@ public class MediaFragment extends Fragment implements AbsMediaProvider.IMediaUR
 
     @Override
     public void onMediaURIsDownloaded(final String pTrend, final ArrayList<Uri> pMediaURIs) {
+
+        mImageResourceLoaderPB.setVisibility(View.INVISIBLE);
 
         mTrendsPictures.putAll(pTrend, pMediaURIs);
         // TODO filter URIs which are already managed by the array adapter
