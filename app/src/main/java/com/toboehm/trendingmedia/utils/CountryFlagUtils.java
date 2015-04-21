@@ -2,6 +2,8 @@ package com.toboehm.trendingmedia.utils;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
+import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
+import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.widget.ImageView;
 
 import com.toboehm.trendingmedia.R;
@@ -33,6 +35,5 @@ public class CountryFlagUtils {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
     }
 }

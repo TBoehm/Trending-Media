@@ -1,5 +1,6 @@
 package com.toboehm.trendingmedia.activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
@@ -35,14 +36,24 @@ public class MainActivity extends ActionBarActivity implements TrendsFragment.Tr
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_share) {
-            return true;
+        // switch menu items
+        switch (item.getItemId()){
+            case R.id.action_share:
+                // TODO implement share action
+                return true;
+            case R.id.action_settings:
+                final Intent settingsIntent = new Intent(MainActivity.this, SettingsActivity.class);
+                startActivity(settingsIntent);
+                return true;
+            case R.id.action_info:
+                final Intent infoIntent = new Intent(MainActivity.this, InfoActivity.class);
+                startActivity(infoIntent);
+                return true;
+            default:
+                // in all other cases
+                return super.onOptionsItemSelected(item);
         }
-
-        return super.onOptionsItemSelected(item);
     }
 
     @Override
